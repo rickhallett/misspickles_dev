@@ -75,6 +75,12 @@ export default {
     }
   },
   methods: {
+    store() {
+      localStorage.setItem('misspicker', JSON.stringify(this.masterStore));
+    },
+    retrieve() {
+      return JSON.parse(localStorage.getItem('misspicker'));
+    },
     addPick() {
       const date = new Date();
       const dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
@@ -84,12 +90,9 @@ export default {
         this.addDate(date, dateStr);
       }
 
-      this.daysPicks++;
+      this.store();
 
       this.compressData();
-
-      console.log('masterStore', this.masterStore);
-      console.log('compressedStore', this.compressedStore);
     },
     incrementDate(date, dateStr) {
       for (let i = 0; i < this.masterStore.length; i++) {
@@ -149,16 +152,23 @@ export default {
   created() {
     log('created', {}, 'green');
 
-    this.masterStore.forEach(record => {
-      for (let hr = 0; hr < 24; hr++) {
-        this.$set(record, hr, utils.genRnd());
-      }
-      
-    })
+    // this.masterStore.forEach(record => {
+    //   for (let hr = 0; hr < 24; hr++) {
+    //     this.$set(record, hr, utils.genRnd());
+    //   }
+    // });
 
-    console.log(this.masterStore['10-09-2020']);
-    log('masterStore', this.masterStore, 'blue');
+    // console.log(this.masterStore['10-09-2020']);
+    // log('masterStore', this.masterStore, 'blue');
 
+    //debugger
+
+    //this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve();
+
+    this.compressData();
+  },
+  mounted() {
+    this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
     this.compressData();
   }
 }
