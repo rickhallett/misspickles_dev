@@ -1,13 +1,16 @@
 <template>
-  <q-page class="flex flex-center">
-    <q-icon name="add_circle_outline" class="text-secondary q-mr-lg add-pick-btn" @click="addPick"></q-icon>
-    <h1>{{ totalPicksToday }}</h1>
-
+  <q-page class="fit column no-wrap justify-around items-center content-start font-applicator">
+    <div>
+      <q-icon name="add_circle_outline" class="text-secondary add-pick-btn" @click="addPick"></q-icon>
+      <h1>{{ totalPicksToday }}</h1>
+    </div>
+    
     <q-table
       title=""
       :data="compressedStore"
       :columns="compressedStoreTableCols"
       row-key="name"
+      class="text-primary"
     />
 
   </q-page>
@@ -62,52 +65,52 @@ export default {
   data() {
     return {
       masterStore: [
-        { date: '10-9-2020' },
-        { date: '11-9-2020' },
-        { date: '12-9-2020' },
-        { date: '13-9-2020' },
-        { date: '14-9-2020' },
-        { date: '15-9-2020' },
-        { date: '16-9-2020' },
-        { date: '17-9-2020' },
+        // { date: '10-9-2020' },
+        // { date: '11-9-2020' },
+        // { date: '12-9-2020' },
+        // { date: '13-9-2020' },
+        // { date: '14-9-2020' },
+        // { date: '15-9-2020' },
+        // { date: '16-9-2020' },
+        // { date: '17-9-2020' },
       ],
       compressedStore: [
-        { date: '10-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '11-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '12-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '13-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '14-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '15-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '16-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
-        { date: '17-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '10-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '11-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '12-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '13-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '14-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '15-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '16-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
+        // { date: '17-9-2020', 'morning': 0, 'afternoon': 0, 'night': 0 },
       ],
       daysPicks: 0,
       masterStoreTableCols: [
-        { name: 'date', label: 'Date', field: 'date', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '0', label: '0:00', field: '0', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '1', label: '1:00', field: '1', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '2', label: '2:00', field: '2', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '3', label: '3:00', field: '3', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '4', label: '4:00', field: '4', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '5', label: '5:00', field: '5', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '6', label: '6:00', field: '6', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '7', label: '7:00', field: '7', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '8', label: '8:00', field: '8', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '9', label: '9:00', field: '9', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '10', label: '10:00', field: '10', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '11', label: '11:00', field: '11', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '12', label: '12:00', field: '12', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '13', label: '13:00', field: '13', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '14', label: '14:00', field: '14', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '15', label: '15:00', field: '15', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '16', label: '16:00', field: '16', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '17', label: '17:00', field: '17', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '18', label: '18:00', field: '18', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '19', label: '19:00', field: '19', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '20', label: '20:00', field: '20', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '21', label: '21:00', field: '21', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '22', label: '22:00', field: '22', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
-        { name: '23', label: '23:00', field: '23', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
+        { name: 'date', label: 'Date', field: 'date' },
+        { name: '0', label: '0:00', field: '0' },
+        { name: '1', label: '1:00', field: '1' },
+        { name: '2', label: '2:00', field: '2' },
+        { name: '3', label: '3:00', field: '3' },
+        { name: '4', label: '4:00', field: '4' },
+        { name: '5', label: '5:00', field: '5' },
+        { name: '6', label: '6:00', field: '6' },
+        { name: '7', label: '7:00', field: '7' },
+        { name: '8', label: '8:00', field: '8' },
+        { name: '9', label: '9:00', field: '9' },
+        { name: '10', label: '10:00', field: '10' },
+        { name: '11', label: '11:00', field: '11' },
+        { name: '12', label: '12:00', field: '12' },
+        { name: '13', label: '13:00', field: '13' },
+        { name: '14', label: '14:00', field: '14' },
+        { name: '15', label: '15:00', field: '15' },
+        { name: '16', label: '16:00', field: '16' },
+        { name: '17', label: '17:00', field: '17' },
+        { name: '18', label: '18:00', field: '18' },
+        { name: '19', label: '19:00', field: '19' },
+        { name: '20', label: '20:00', field: '20' },
+        { name: '21', label: '21:00', field: '21' },
+        { name: '22', label: '22:00', field: '22' },
+        { name: '23', label: '23:00', field: '23' },
       ],
       compressedStoreTableCols: [
         { name: 'date', label: 'Date', field: 'date', sortable: true, style: '', classes: '', headerStyle: '', headerClasses: '', },
@@ -122,11 +125,9 @@ export default {
       const date = new Date();
       const dateStr = `${date.getDate()}-${date.getMonth() + 1}-${date.getFullYear()}`;
 
-      for (let i = 0; i < this.masterStore.length; i++) {
-        if (this.masterStore[i].date === dateStr) {
-          this.masterStore[i][date.getHours()]++;
-          break;
-        }
+      const didInc = this.incrementDate(date, dateStr);
+      if (!didInc) {
+        this.addDate(date, dateStr);
       }
 
       this.daysPicks++;
@@ -135,6 +136,23 @@ export default {
 
       console.log('masterStore', this.masterStore);
       console.log('compressedStore', this.compressedStore);
+    },
+    incrementDate(date, dateStr) {
+      for (let i = 0; i < this.masterStore.length; i++) {
+        if (this.masterStore[i].date === dateStr) {
+          this.masterStore[i][date.getHours()]++;
+          return true;
+        }
+      }
+
+      return false;
+    },
+    addDate(date, dateStr) {
+      this.masterStore.push({ date: dateStr });
+      for (let hr = 0; hr < 24; hr++) {
+        this.$set(this.masterStore[this.masterStore.length - 1], hr, 0);
+      }
+      this.masterStore[this.masterStore.length - 1][date.getHours()]++;
     },
     compressData() {
       for (let record = 0; record < this.masterStore.length; record++) {
@@ -193,6 +211,15 @@ export default {
 </script>
 
 <style>
+  .font-applicator {
+    /* font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; */
+    font-family: monospace, Cochin, Georgia, Times, 'Times New Roman', serif;
+  }
+
+  h1 {
+    text-align: center;
+  }
+
   .add-pick-btn {
     font-size: 158px;
     cursor: pointer;
