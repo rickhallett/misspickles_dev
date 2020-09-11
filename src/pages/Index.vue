@@ -61,6 +61,8 @@ const utils = {
   },
 };
 
+const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
 const log = utils.createLog("app");
 
 export default {
@@ -68,14 +70,14 @@ export default {
   data() {
     return {
       masterStore: [
-        { date: "10-9-2020" },
-        { date: "11-9-2020" },
-        { date: "12-9-2020" },
-        { date: "13-9-2020" },
-        { date: "14-9-2020" },
-        { date: "15-9-2020" },
-        { date: "16-9-2020" },
-        { date: "17-9-2020" },
+        { date: "10-Sep-2020" },
+        { date: "11-Sep-2020" },
+        { date: "12-Sep-2020" },
+        { date: "13-Sep-2020" },
+        { date: "14-Sep-2020" },
+        { date: "15-Sep-2020" },
+        { date: "16-Sep-2020" },
+        { date: "17-Sep-2020" },
       ],
       compressedStore: [],
       summaryStore: [],
@@ -133,7 +135,7 @@ export default {
     addPick() {
       const date = new Date();
       const dateStr = `${date.getDate()}-${
-        date.getMonth() + 1
+        months[date.getMonth()]
       }-${date.getFullYear()}`;
 
       const didInc = this.incrementDate(date, dateStr);
@@ -211,7 +213,7 @@ export default {
       var label = d3.select(".sum-graph");
       // Set the dimensions of the canvas / graph
       var margin = { top: 30, right: 20, bottom: 30, left: 50 },
-        width = 575 - margin.left - margin.right,
+        width = 375 - margin.left - margin.right,
         height = 270 - margin.top - margin.bottom;
 
       // Parse the date / time
@@ -222,7 +224,7 @@ export default {
       var y = d3.scale.linear().range([height, 0]);
 
       // Define the axes
-      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(4);
 
       var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
 
@@ -245,14 +247,28 @@ export default {
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-      var data = [
-        { date: "10-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
-        { date: "11-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
-        { date: "12-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
-        { date: "13-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
-      ];
+      // var data = [
+      //   { date: "10-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
+      //   { date: "11-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
+      //   { date: "12-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
+      //   { date: "13-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
+      //   { date: "14-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
+      //   { date: "15-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
+      //   { date: "16-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
+      //   { date: "17-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
+      //   { date: "18-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
+      //   { date: "19-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
+      //   { date: "20-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
+      //   { date: "21-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
+      //   { date: "22-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
+      //   { date: "23-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
+      //   { date: "24-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
+      //   { date: "25-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
+      // ];
 
       // Get the data
+
+      let data = Object.assign(this.summaryStore);
 
       data.forEach(function (d) {
         d.date = parseDate(d.date);
@@ -284,7 +300,7 @@ export default {
         .data(data)
         .enter()
         .append("circle")
-        .attr("r", 10)
+        .attr("r", 6)
         .attr("cx", function (d) {
           return x(d.date);
         })
@@ -370,7 +386,7 @@ h1 {
 }
 
 path {
-  stroke: steelblue;
+  stroke: var(--q-color-primary);
   stroke-width: 2;
   fill: none;
 }
@@ -378,7 +394,7 @@ path {
 .axis path,
 .axis line {
   fill: none;
-  stroke: grey;
+  stroke: var(--q-color-primary);
   stroke-width: 1;
   shape-rendering: crispEdges;
 }
@@ -389,7 +405,8 @@ path {
 
 circle {
   cursor: pointer;
-  fill: steelblue;
+  fill: var(--q-color-secondary);;
+
 }
 
 .font-applicator {
