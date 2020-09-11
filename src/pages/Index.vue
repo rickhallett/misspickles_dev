@@ -374,7 +374,6 @@ export default {
   mounted() {
     // storage version
     this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
-    debugger;
 
     //random version
     // this.masterStore.forEach((record) => {
