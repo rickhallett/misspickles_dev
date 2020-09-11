@@ -20,6 +20,36 @@
   
 <script>
 
+const version = '1.1.1';
+const previousVersion = '1.1';
+
+const months = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec",
+];
+
+const debug = {
+  log: false
+};
+
+const randomTest = false;
+
+const autoInc = {
+  now: false,
+};
+
+const autoclear = !debug.log;
+
 JSON.clone = function(obj) {
   if (!obj) throw new Error('JSON.clone parameter value invalid.');
   return JSON.parse(JSON.stringify(obj));
@@ -41,23 +71,28 @@ const utils = {
   createLog(name = "default") {
     let n = 0;
     return (msg, obj = {}, color = null) => {
-      n++;
-      const errStr = `${name} log: ${new Date().toISOString()}-LOG-#${n} => ${msg}`;
-      const logStr = ` %c${name} log:${new Date().toISOString()}-LOG-#${n} => ${msg}`;
-      const colorStr = `${color ? "color:" + color : ""}`;
+      if (debug.log) {
+        n++;
+        const errStr = `${name} log: ${new Date().toISOString()}-LOG-#${n} => ${msg}`;
+        const logStr = ` %c${name} log:${new Date().toISOString()}-LOG-#${n} => ${msg}`;
+        const colorStr = `${color ? "color:" + color : ""}`;
 
-      if (msg instanceof Error) {
-        console.error(errStr, obj);
-        return false;
+        if (msg instanceof Error) {
+          console.error(errStr, obj);
+          return false;
+        }
+
+        if (Array.from(Object.keys(obj)).length === 0) {
+          console.log(logStr, colorStr);
+          return;
+        }
+
+        console.log(logStr, colorStr, obj);
+        return true;
       }
 
-      if (Array.from(Object.keys(obj)).length === 0) {
-        console.log(logStr, colorStr);
-        return;
-      }
-
-      console.log(logStr, colorStr, obj);
-      return true;
+      return void 0;
+      
     };
   },
   genRnd() {
@@ -65,37 +100,13 @@ const utils = {
   },
 };
 
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
 const log = utils.createLog("app");
 
 export default {
   name: "Main",
   data() {
     return {
-      masterStore: [
-        // { date: "10-Sep-2020" },
-        // { date: "11-Sep-2020" },
-        // { date: "12-Sep-2020" },
-        // { date: "13-Sep-2020" },
-        // { date: "14-Sep-2020" },
-        // { date: "15-Sep-2020" },
-        // { date: "16-Sep-2020" },
-        // { date: "17-Sep-2020" },
-      ],
+      masterStore: [],
       compressedStore: [],
       summaryStore: [],
       compressedStoreTableCols: [
@@ -144,10 +155,10 @@ export default {
   },
   methods: {
     store() {
-      localStorage.setItem("misspicker1.1", JSON.stringify(this.masterStore));
+      localStorage.setItem(`misspicker${version}`, JSON.stringify(this.masterStore));
     },
     retrieve() {
-      return JSON.parse(localStorage.getItem("misspicker1.1"));
+      return JSON.parse(localStorage.getItem(`misspicker${version}`));
     },
     addPick() {
       const date = new Date();
@@ -227,9 +238,11 @@ export default {
       });
     },
     printGraphData() {
+      log('printing graph data', {}, 'yellow');
       document.querySelectorAll('svg').forEach(s => s.remove());
 
       var label = d3.select(".sum-graph");
+
       // Set the dimensions of the canvas / graph
       var margin = { top: 30, right: 20, bottom: 30, left: 50 },
         width = 375 - margin.left - margin.right,
@@ -268,31 +281,12 @@ export default {
 
       // Get the data
 
-      var dataR = JSON.clone(this.summaryStore);
+      let data = JSON.clone(this.summaryStore);
 
-      // var dataT = [
-      //   { date: "10-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
-      //   { date: "11-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
-      //   { date: "12-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
-      //   { date: "13-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
-      // ];
-
-      // dataT.forEach(function (d) {
-      //   console.log(d.date)
-      //   d.date = parseDate(d.date);
-      //   d.close = +d.total;
-      // });
-
-      // console.log('dataT', dataT);
-
-      dataR.forEach(function (d) {
+      data.forEach(function (d) {
         d.date = parseDate(d.date);
         d.close = +d.total;
       });
-
-      console.log('dataR', dataR);
-
-      var data = dataR;
 
       // Scale the range of the data
       x.domain(
@@ -369,33 +363,54 @@ export default {
     },
   },
   created() {
+    log('app instance created', {}, 'limegreen');
     this.compressData();
     localStorage.removeItem("misspicker");
+    localStorage.removeItem(`misspicker${previousVersion}`);
   },
   mounted() {
-    // storage version
-    this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
+    log('app instance mounted', {}, 'limegreen');
+    if (randomTest) {
+      this.masterStore = [
+        { date: "10-Sep-2020" },
+        { date: "11-Sep-2020" },
+        { date: "12-Sep-2020" },
+        { date: "13-Sep-2020" },
+        { date: "14-Sep-2020" },
+        { date: "15-Sep-2020" },
+        { date: "16-Sep-2020" },
+        { date: "17-Sep-2020" },
+      ];
+      this.masterStore.forEach((record) => {
+        for (let hr = 0; hr < 24; hr++) {
+          this.$set(record, hr, utils.genRnd());
+        }
+      });
+    } else {
+      this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
+    }
 
-    //random version
-    // this.masterStore.forEach((record) => {
-    //   for (let hr = 0; hr < 24; hr++) {
-    //     this.$set(record, hr, utils.genRnd());
-    //   }
-    // });
-
+    log('compressing data', {}, 'orange');
     this.compressData();
+    log('summarising data', {}, 'orange');
     this.summariseData();
+
     this.printGraphData();
 
     window.t = this.printGraphData;
     window.p = this.addPick;
 
-    // setInterval(() => {
-    //   this.addPick();
-    // }, 50);
+    if (autoInc.now) {
+      setInterval(() => {
+        this.addPick();
+      }, 50);
+    }
 
-      //console.clear();
+    if (autoclear) {
+      console.clear();
+    }
 
+  
     console.log("masterStore", this.masterStore);
     console.log("compressedStore", this.compressedStore);
     console.log("summaryStore", this.summaryStore);
