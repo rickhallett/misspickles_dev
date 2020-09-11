@@ -370,6 +370,7 @@ export default {
   },
   created() {
     this.compressData();
+    localStorage.removeItem("misspicker");
   },
   mounted() {
     // storage version
