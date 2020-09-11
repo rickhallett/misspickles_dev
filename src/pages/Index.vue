@@ -147,7 +147,7 @@ export default {
       localStorage.setItem("misspicker1.1", JSON.stringify(this.masterStore));
     },
     retrieve() {
-      return JSON.parse(localStorage.getItem("misspicker"));
+      return JSON.parse(localStorage.getItem("misspicker1.1"));
     },
     addPick() {
       const date = new Date();
