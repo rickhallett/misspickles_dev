@@ -13,13 +13,13 @@
       class="text-primary"
     />
 
-    <div id="my_dataviz"></div>
+    <div class="sum-graph"></div>
   </q-page>
 </template>
 
+  
 <script>
-const d3 = require("d3");
-console.log(d3);
+
 
 const utils = {
   *splitNParts(num, parts) {
@@ -207,6 +207,111 @@ export default {
         };
       });
     },
+    printGraphData() {
+      var label = d3.select(".sum-graph");
+      // Set the dimensions of the canvas / graph
+      var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+        width = 575 - margin.left - margin.right,
+        height = 270 - margin.top - margin.bottom;
+
+      // Parse the date / time
+      var parseDate = d3.time.format("%d-%b-%Y").parse;
+
+      // Set the ranges
+      var x = d3.time.scale().range([0, width]);
+      var y = d3.scale.linear().range([height, 0]);
+
+      // Define the axes
+      var xAxis = d3.svg.axis().scale(x).orient("bottom").ticks(5);
+
+      var yAxis = d3.svg.axis().scale(y).orient("left").ticks(5);
+
+      // Define the line
+      var valueline = d3.svg
+        .line()
+        .x(function (d) {
+          return x(d.date);
+        })
+        .y(function (d) {
+          return y(d.close);
+        });
+
+      // Adds the svg canvas
+      var svg = d3
+        .select("body")
+        .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+        .append("g")
+        .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+      var data = [
+        { date: "10-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 1 },
+        { date: "11-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 4 },
+        { date: "12-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 5 },
+        { date: "13-Sep-2020", morning: 1, afternoon: 2, night: 6, total: 6 },
+      ];
+
+      // Get the data
+
+      data.forEach(function (d) {
+        d.date = parseDate(d.date);
+        d.close = +d.total;
+      });
+
+      // Scale the range of the data
+      x.domain(
+        d3.extent(data, function (d) {
+          return d.date;
+        })
+      );
+      y.domain([
+        0,
+        d3.max(data, function (d) {
+          return d.total;
+        }),
+      ]);
+
+      // Add the valueline path.
+      svg
+        .append("path") // Add the valueline path.
+        .attr("class", "line")
+        .attr("d", valueline(data));
+
+      // Add the valueline path.
+      svg // Add the valueline path.
+        .selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("r", 10)
+        .attr("cx", function (d) {
+          return x(d.date);
+        })
+        .attr("cy", function (d) {
+          return y(d.close);
+        })
+        .on("mouseover", function (d, i) {
+          label.style(
+            "transform",
+            "translate(" + x(d.date) + "px," + y(d.total) + "px)"
+          );
+          label.text(d.total);
+        });
+
+      // Add the X Axis
+      svg
+        .append("g") // Add the X Axis
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+      // Add the Y Axis
+      svg
+        .append("g") // Add the Y Axis
+        .attr("class", "y axis")
+        .call(yAxis);
+    },
   },
   computed: {
     totalPicksToday() {
@@ -244,145 +349,13 @@ export default {
 
     this.compressData();
     this.summariseData();
+    this.printGraphData();
+
+    window.t = this.printGraphData;
 
     console.log("summaryStore", this.summaryStore);
-
-    // set the dimensions and margins of the graph
-    const height = 400;
-    const width = 400; 
-    const margin = { top: 20,right: 40, bottom: 20, left: 40 };
-    const innerWidth = width - margin.left - margin.right;
-    const innerHeight = height - margin.top - margin.bottom;
-
-    // append the svg object to the body of the page
-    let svg = d3
-      .select("#my_dataviz")
-      .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom);
-    // .append("g")
-    //   .attr("transform",
-    //         "translate(" + margin.left + "," + margin.top + ")");
-
-    const xScale = d3.scaleLinear().domain([1, 31]).range([0, innerWidth]); //scope of data going out / pixels
-    const yScale = d3.scaleLinear().domain([0, 300]).range([innerHeight, 0]);
-
-    const circle = svg
-      .selectAll(".ufoCircle") //select all elements with class ufoCircle. (There currently are none)
-      .data(this.summaryStore) //attach the data
-      .enter()
-      .append("circle") //aopend one circle for each data point. There are 11 data points, so there will be 11 circles
-      .attr("class", "totalCircle") //give each circle class ufoCircle
-      .attr("r", 8) //assign radius
-      // Position the circles based on their x and y attributes.
-      .attr("cx", function (d) {
-        return xScale(d.day);
-      })
-      .attr("cy", function (d) {
-        return yScale(d.total);
-      });
-
-    const text = svg
-      .selectAll("text")
-      .data(this.summaryStore)
-      .enter()
-      .append("text")
-      .attr("x", function (d) {
-        return xScale(d.day);
-      })
-      .attr("y", function (d) {
-        return yScale(d.total);
-      })
-      .text(function (d) {
-        return d.total;
-      })
-      .attr("dx", 10) //moves text 10px (right) on the x axis
-      .attr("dy", -10); //moves text -10px (up) on the y axis. These help move the text so it's not overlapping with the circles
-
-    const dataGroup = svg.selectAll('.ufoGroup')
-      .data(data).enter().append('g') 
-      .attr('class', 'dataGroup')
-      .attr('transform', function(d) { return 'translate(' + xScale(d.day) + ',' + yScale(d.total) + ')'});
-
-    //append circles to ufoGroup
-    dataGroup.append('circle')
-      .attr('class', 'ufoCircle')
-      .attr('r', 10)
-
-    //append text to ufoGroup
-    dataGroup.append('text')
-      .attr('class', 'ufoText')
-      .attr('dx', 10)
-      .attr('dy', -10)
-      .text(function(d) { return d.total})
-
-    
-
-    //Define an Xaxis for your scale with the ticks oriented on the bottom
-    const xAxis = d3.axisBottom(xScale)
-                    .tickSize(-innerHeight);
-
-    //Define a yAxis with your ticks oriented on the left.
-    const yAxis = d3.axisLeft(yScale);
-
-    //Append a g element to your svg, and call your xAxis function.
-    const xAxisGroup = svg
-      .append("g")
-      .attr("class", "x axis") //gives group the classes 'x' and 'axis'
-      .call(xAxis);
-
-    //Append a g element to your svg, and call your yAxis function.
-    const yAxisGroup = svg
-      .append("g")
-      .attr("class", "y axis") //gives group the classes 'y' and 'axis'
-      .call(yAxis);
-  },
+  }
 };
-
-//Read the data
-// d3.json(JSON.stringify(this.compressedStore),
-//   // When reading the csv, I must format letiables:
-//   function(d){
-//     return { date : d3.timeParse("%Y-%m-%d")(d.date), value : d.value }
-//   },
-
-//   // Now I can use this dataset:
-//   function(data) {
-//     // Add X axis --> it is a date format
-//     let x = d3.scaleTime()
-//       .domain(d3.extent(data, function(d) { return d.date; }))
-//       .range([ 0, width ]);
-//     svg.append("g")
-//       .attr("transform", "translate(0," + height + ")")
-//       .call(d3.axisBottom(x));
-//     // Add Y axis
-//     let y = d3.scaleLinear()
-//       .domain( [8000, 9200])
-//       .range([ height, 0 ]);
-//     svg.append("g")
-//       .call(d3.axisLeft(y));
-//     // Add the line
-//     svg.append("path")
-//       .datum(data)
-//       .attr("fill", "none")
-//       .attr("stroke", "#69b3a2")
-//       .attr("stroke-width", 1.5)
-//       .attr("d", d3.line()
-//         .x(function(d) { return x(d.date) })
-//         .y(function(d) { return y(d.value) })
-//         )
-//     // Add the points
-//     svg
-//       .append("g")
-//       .selectAll("dot")
-//       .data(data)
-//       .enter()
-//       .append("circle")
-//         .attr("cx", function(d) { return x(d.date) } )
-//         .attr("cy", function(d) { return y(d.value) } )
-//         .attr("r", 5)
-//         .attr("fill", "#69b3a2")
-// });
 </script>
 
 <style>
@@ -396,30 +369,27 @@ h1 {
   cursor: pointer;
 }
 
-svg {
-  border: 1px solid var(--q-color-secondary);
+path {
+  stroke: steelblue;
+  stroke-width: 2;
+  fill: none;
 }
 
-.totalCircle {
-  fill: var(--q-color-secondary);
-}
-
-.circle {
-}
-
+.axis path,
 .axis line {
-  stroke-width:1px;
-  stroke: #ccc;
-  stroke-dasharray: 2px 2px;
+  fill: none;
+  stroke: grey;
+  stroke-width: 1;
+  shape-rendering: crispEdges;
 }
 
-.axis text {
-  font-size: 12px;
-  fill: #777;
+.label {
+  position: absolute;
 }
 
-.axis path {
-  display: none;
+circle {
+  cursor: pointer;
+  fill: steelblue;
 }
 
 .font-applicator {
