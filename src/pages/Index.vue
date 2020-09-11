@@ -87,14 +87,14 @@ export default {
   data() {
     return {
       masterStore: [
-        { date: "10-Sep-2020" },
-        { date: "11-Sep-2020" },
-        { date: "12-Sep-2020" },
-        { date: "13-Sep-2020" },
-        { date: "14-Sep-2020" },
-        { date: "15-Sep-2020" },
-        { date: "16-Sep-2020" },
-        { date: "17-Sep-2020" },
+        // { date: "10-Sep-2020" },
+        // { date: "11-Sep-2020" },
+        // { date: "12-Sep-2020" },
+        // { date: "13-Sep-2020" },
+        // { date: "14-Sep-2020" },
+        // { date: "15-Sep-2020" },
+        // { date: "16-Sep-2020" },
+        // { date: "17-Sep-2020" },
       ],
       compressedStore: [],
       summaryStore: [],
@@ -147,7 +147,7 @@ export default {
       localStorage.setItem("misspicker1.1", JSON.stringify(this.masterStore));
     },
     retrieve() {
-      return JSON.parse(localStorage.getItem("misspicker1.1"));
+      return JSON.parse(localStorage.getItem("misspicker"));
     },
     addPick() {
       const date = new Date();
@@ -374,6 +374,7 @@ export default {
   mounted() {
     // storage version
     this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
+    debugger;
 
     //random version
     // this.masterStore.forEach((record) => {
