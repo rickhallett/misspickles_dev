@@ -1,8 +1,7 @@
-
 const routes = [
   {
     path: '/',
-    component: () => import('layouts/MainLayout.vue'),
+    component: () => import('layouts/Main.vue'),
     children: [
       { path: '', component: () => import('pages/Index.vue') },
       { path: '/chart', component: () => import('pages/Chart.vue') },
@@ -18,6 +17,6 @@ const routes = [
     path: '*',
     component: () => import('pages/Error404.vue')
   }
-]
+];
 
-export default routes
+export default routes;

@@ -3,19 +3,25 @@ export const linksData = [
     title: 'Home',
     caption: 'Tracker',
     icon: 'add_task',
-    link: '/'
+    link: '/',
   },
   {
     title: 'Chart',
     caption: 'Measure Progress',
     icon: 'article',
-    link: '/chart'
+    link: '/chart',
   },
   {
     title: 'Graph',
     caption: 'Visualise Progress',
     icon: 'assessment',
     link: '/graph'
+  },
+  {
+    title: 'Stats',
+    caption: 'Overview',
+    icon: 'article',
+    link: '/chart',
   },
   {
     title: 'Journal',
@@ -26,13 +32,19 @@ export const linksData = [
   {
     title: 'Edit',
     caption: 'Forgot to track? Add them here',
-    icon: 'loop',
+    icon: 'edit',
     link: '/edit'
+  },
+  {
+    title: 'Settings',
+    caption: 'Change your preferences',
+    icon: 'phonelink_setup',
+    link: '/settings'
   }
 ];
 
-export const version = "1.1.1";
-export const previousVersion = "1.1";
+export const version = "1.2.0";
+export const previousVersion = "1.1.1";
 
 export const months = [
   "Jan",
