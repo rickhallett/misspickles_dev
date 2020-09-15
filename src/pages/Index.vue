@@ -13,92 +13,43 @@
       class="text-primary"
     />
 
+    <q-card>
+      <q-list>
+        <q-item class="row justify-between bg-grey-4">
+            <q-item-section>Best Day</q-item-section>
+            <q-item-section caption class="q-ml-md">{{ bestDay }}</q-item-section>
+        </q-item>
+        <q-item class="row justify-between">
+            <q-item-section>Worst Day</q-item-section>
+            <q-item-section caption class="q-ml-md">{{ worstDay }}</q-item-section>
+        </q-item>
+        <q-item class="row justify-between bg-grey-4"> 
+            <q-item-section>Daily Average</q-item-section>
+            <q-item-section caption>{{ averages.daily }}</q-item-section>
+        </q-item>
+        <q-item class="row justify-between">
+            <q-item-section>AM Average</q-item-section>
+            <q-item-section caption>{{ averages.am }}</q-item-section>
+        </q-item>
+        <q-item class="row justify-between bg-grey-4">
+            <q-item-section>PM Average</q-item-section>
+            <q-item-section caption>{{ averages.pm }}</q-item-section>
+        </q-item>
+        <q-item class="row justify-between">
+            <q-item-section>Night Average</q-item-section>
+            <q-item-section caption>{{ averages.night }}</q-item-section>
+        </q-item>
+      </q-list>
+    </q-card>
+
     <div class="sum-graph"></div>
   </q-page>
 </template>
 
   
 <script>
-
-const version = '1.1.1';
-const previousVersion = '1.1';
-
-const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
-];
-
-const debug = {
-  log: false
-};
-
-const randomTest = false;
-
-const autoInc = {
-  now: false,
-};
-
-const autoclear = !debug.log;
-
-JSON.clone = function(obj) {
-  if (!obj) throw new Error('JSON.clone parameter value invalid.');
-  return JSON.parse(JSON.stringify(obj));
-}
-
-const utils = {
-  *splitNParts(num, parts) {
-    let sumParts = 0;
-    for (let i = 0; i < parts - 1; i++) {
-      const pn = Math.ceil(Math.random() * (num - sumParts));
-      yield pn;
-      sumParts += pn;
-    }
-    yield num - sumParts;
-  },
-  deepEqual(obj1, obj2) {
-    return JSON.stringify(obj1) === JSON.stringify(obj2);
-  },
-  createLog(name = "default") {
-    let n = 0;
-    return (msg, obj = {}, color = null) => {
-      if (debug.log) {
-        n++;
-        const errStr = `${name} log: ${new Date().toISOString()}-LOG-#${n} => ${msg}`;
-        const logStr = ` %c${name} log:${new Date().toISOString()}-LOG-#${n} => ${msg}`;
-        const colorStr = `${color ? "color:" + color : ""}`;
-
-        if (msg instanceof Error) {
-          console.error(errStr, obj);
-          return false;
-        }
-
-        if (Array.from(Object.keys(obj)).length === 0) {
-          console.log(logStr, colorStr);
-          return;
-        }
-
-        console.log(logStr, colorStr, obj);
-        return true;
-      }
-
-      return void 0;
-      
-    };
-  },
-  genRnd() {
-    return Math.ceil(Math.random() * 10) + 1;
-  },
-};
+import { version, previousVersion, months, debug, randomTest, autoInc, autoclear } from '../lib/constants';
+import { utils } from '../lib/utils';
 
 const log = utils.createLog("app");
 
@@ -109,6 +60,14 @@ export default {
       masterStore: [],
       compressedStore: [],
       summaryStore: [],
+      bestDay: '12-09-2020',
+      worstDay: '13-09-2020',
+      averages: {
+        daily: null,
+        am: null,
+        pm: null,
+        night: null,
+      },
       compressedStoreTableCols: [
         {
           name: "date",
@@ -155,7 +114,10 @@ export default {
   },
   methods: {
     store() {
-      localStorage.setItem(`misspicker${version}`, JSON.stringify(this.masterStore));
+      localStorage.setItem(
+        `misspicker${version}`,
+        JSON.stringify(this.masterStore)
+      );
     },
     retrieve() {
       return JSON.parse(localStorage.getItem(`misspicker${version}`));
@@ -171,10 +133,75 @@ export default {
         this.addDate(date, dateStr);
       }
 
-      this.store();
-      this.compressData();
-      this.summariseData();
-      this.printGraphData();
+      this.enrichData();
+    },
+    findBestDay() {
+      let best = {
+        date: null,
+        total: 0,
+      };
+
+      for (let i = 0; i < this.summaryStore.length; i++) {
+        const element = this.summaryStore[i];
+        if (element.total > best.total) {
+          best.date = element.date;
+          best.total = element.total;
+        }
+      }
+
+      this.best = best;
+    },
+    findWorstDay() {
+      let worst = {
+        date: null,
+        total: 0,
+      };
+
+      for (let i = 0; i < this.summaryStore.length; i++) {
+        const element = this.summaryStore[i];
+        if (element.total > worst.total) {
+          worst.date = element.date;
+          worst.total = element.total;
+        }
+      }
+
+      this.worst = worst;
+    },
+    aggregateAverages() {
+      function addTotals({ total, count }, record) {
+        return {
+          total: total + record,
+          count: count + 1,
+        };
+      }
+
+      const morningData = { total: 0, count: 0 };
+      const morning = this.compressedStore
+        .map((r) => r.morning)
+        .reduce(addTotals, morningData);
+
+      const { morningTotal, morningCount } = morning;
+      
+      this.averages.am = morningTotal / morningCount;
+
+      const afternoonData = { total: 0, count: 0 };
+      const afternoon = this.compressedStore
+        .map((r) => r.afternoon)
+        .reduce(addTotals, morningData).total;
+
+      const { afternoonTotal, afternoonCount } = afternoon;
+      this.averages.pm = afternoonData / afternoonTotal;
+
+      const nightData = { total: 0, count: 0 };
+      const night = this.compressedStore
+        .map((r) => r.night)
+        .reduce(addTotals, nightData).total;
+
+      const { nightTotal, nightCount } = night;
+      this.averages.night = nightTotal / nightCount;
+
+      this.averages.daily =
+        morningTotal + afternoonTotal + nightTotal;
     },
     incrementDate(date, dateStr) {
       for (let i = 0; i < this.masterStore.length; i++) {
@@ -238,8 +265,8 @@ export default {
       });
     },
     printGraphData() {
-      log('printing graph data', {}, 'yellow');
-      document.querySelectorAll('svg').forEach(s => s.remove());
+      log("printing graph data", {}, "yellow");
+      document.querySelectorAll("svg").forEach((s) => s.remove());
 
       var label = d3.select(".sum-graph");
 
@@ -341,6 +368,16 @@ export default {
         .attr("class", "y axis")
         .call(yAxis);
     },
+    enrichData() {
+      this.store();
+      this.compressData();
+      this.summariseData();
+      this.aggregateAverages();
+      this.findBestDay();
+      this.findWorstDay();
+      this.printGraphData();
+    }
+  
   },
   computed: {
     totalPicksToday() {
@@ -363,13 +400,13 @@ export default {
     },
   },
   created() {
-    log('app instance created', {}, 'limegreen');
+    log("app instance created", {}, "limegreen");
     this.compressData();
     localStorage.removeItem("misspicker");
     localStorage.removeItem(`misspicker${previousVersion}`);
   },
   mounted() {
-    log('app instance mounted', {}, 'limegreen');
+    log("app instance mounted", {}, "limegreen");
     if (randomTest) {
       this.masterStore = [
         { date: "10-Sep-2020" },
@@ -387,15 +424,11 @@ export default {
         }
       });
     } else {
-      this.masterStore = this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
+      this.masterStore =
+        this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
     }
 
-    log('compressing data', {}, 'orange');
-    this.compressData();
-    log('summarising data', {}, 'orange');
-    this.summariseData();
-
-    this.printGraphData();
+    this.enrichData();
 
     window.t = this.printGraphData;
     window.p = this.addPick;
@@ -410,7 +443,6 @@ export default {
       console.clear();
     }
 
-  
     console.log("masterStore", this.masterStore);
     console.log("compressedStore", this.compressedStore);
     console.log("summaryStore", this.summaryStore);
@@ -422,11 +454,16 @@ export default {
 h1 {
   text-align: center;
   color: grey;
+  margin: 20px;
 }
 
 .add-pick-btn {
-  font-size: 158px;
+  font-size: 120px;
   cursor: pointer;
+}
+
+div .add-pick-btn {
+  margin: auto;
 }
 
 path {
