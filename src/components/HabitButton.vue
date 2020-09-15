@@ -8,5 +8,15 @@
 <script>
 export default {
   name: 'HabitButton',
+  data() {
+    return {
+        totalPicksToday: this.$store.state.totalPicksToday
+    }
+  },
+  methods: {
+      addPick() {
+          this.$store.dispatch('addPick');
+      }
+  }
 }
 </script>

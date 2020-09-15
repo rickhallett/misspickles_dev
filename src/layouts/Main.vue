@@ -53,6 +53,8 @@ import { utils } from "../lib/utils";
 
 const log = utils.createLog("main");
 
+Vue.use(Vuex);
+
 const store = new Vuex.Store({
   state: {
     version: version,
@@ -113,67 +115,69 @@ const store = new Vuex.Store({
     ],
   },
   getters: {
-    getTodo: (state) => (id) => {
-    	//return state.todos.find(todo => todo.id === id)
-    },
     getVersion: (state) => {
-      return state.version;
+      return state.version; //return state.todos.find(todo => todo.id === id)
     }
   },
   actions: {
-    // updateChecked(context, payload) {
-    //   context.commit("updateChecked", payload);
-    // },
-  },
-  mutations: {
-    // increment: (state) => state.count++,
-    // decrement: (state) => state.count--,
-    // updateChecked(state, payload) {
-    //   state.checkedNames = payload;
-    // },
-  },
-});
+    addPick(context, payload) {
+      const date = new Date();
+      const dateStr = `${date.getDate()}-${months[date.getMonth()]}-${date.getFullYear()}`;
 
-export default {
-  name: "Main",
-  store: store,
-  components: { EssentialLink },
-  data() {
-    return {
-      leftDrawerOpen: this.$store.state.leftDrawerOpen
-    };
-  },
-  methods: {
-    store() {
+      //const didInc = this.incrementDate(date, dateStr);
+      const didInc = context.dispatch('incrementDate', date, dateStr)
+      if (!didInc) {
+        // this.addDate(date, dateStr);
+        context.dispatch('addDate', date, dateStr);
+      }
+
+      // this.enrichData();
+      context.dispatch('enrichData');
+    },
+    incrementDate(context, date, dateStr) {
+      console.log(this)
+      for (let i = 0; i < this.state.masterStore.length; i++) {
+        if (this.state.masterStore[i].date === dateStr) {
+          this.state.masterStore[i][date.getHours()]++;
+          return true;
+        }
+      }
+
+      return false;
+    },
+    addDate(context, date, dateStr) {
+      this.masterStore.push({ date: dateStr });
+      for (let hr = 0; hr < 24; hr++) {
+        this.state.$set(this.state.masterStore[this.state.masterStore.length - 1], hr, 0); //TODO: 
+      }
+      this.state.masterStore[this.state.masterStore.length - 1][date.getHours()]++;
+    },
+    enrichData(context) {
+      context.dispatch('store');
+      context.dispatch('compressData');
+      context.dispatch('summariseData');
+      context.dispatch('aggregateAverages');
+      context.dispatch('findBestDay');
+      context.dispatch('findWorstDay');
+      context.dispatch('printGraphData');
+    },
+    store(context) {
       localStorage.setItem(
         `misspicker${version}`,
         JSON.stringify(this.masterStore)
       );
     },
-    retrieve() {
+    retrieve(context) {
       return JSON.parse(localStorage.getItem(`misspicker${version}`));
     },
-    addPick() {
-      const date = new Date();
-      const dateStr = `${date.getDate()}-${
-        months[date.getMonth()]
-      }-${date.getFullYear()}`;
-
-      const didInc = this.incrementDate(date, dateStr);
-      if (!didInc) {
-        this.addDate(date, dateStr);
-      }
-
-      this.enrichData();
-    },
-    findBestDay() {
+    findBestDay(context) {
       let best = {
         date: null,
         total: 0,
       };
 
-      for (let i = 0; i < this.summaryStore.length; i++) {
-        const element = this.summaryStore[i];
+      for (let i = 0; i < this.state.summaryStore.length; i++) {
+        const element = this.state.summaryStore[i];
         if (element.total > best.total) {
           best.date = element.date;
           best.total = element.total;
@@ -182,14 +186,14 @@ export default {
 
       this.best = best;
     },
-    findWorstDay() {
+    findWorstDay(context) {
       let worst = {
         date: null,
         total: 0,
       };
 
-      for (let i = 0; i < this.summaryStore.length; i++) {
-        const element = this.summaryStore[i];
+      for (let i = 0; i < this.state.summaryStore.length; i++) {
+        const element = this.state.summaryStore[i];
         if (element.total > worst.total) {
           worst.date = element.date;
           worst.total = element.total;
@@ -198,7 +202,7 @@ export default {
 
       this.worst = worst;
     },
-    aggregateAverages() {
+    aggregateAverages(context) {
       function addTotals({ total, count }, record) {
         return {
           total: total + record,
@@ -207,7 +211,7 @@ export default {
       }
 
       const morningData = { total: 0, count: 0 };
-      const morning = this.compressedStore
+      const morning = this.state.compressedStore
         .map((r) => r.morning)
         .reduce(addTotals, morningData);
 
@@ -216,7 +220,7 @@ export default {
       this.averages.am = morningTotal / morningCount;
 
       const afternoonData = { total: 0, count: 0 };
-      const afternoon = this.compressedStore
+      const afternoon = this.state.compressedStore
         .map((r) => r.afternoon)
         .reduce(addTotals, morningData).total;
 
@@ -224,7 +228,7 @@ export default {
       this.averages.pm = afternoonData / afternoonTotal;
 
       const nightData = { total: 0, count: 0 };
-      const night = this.compressedStore
+      const night = this.state.compressedStore
         .map((r) => r.night)
         .reduce(addTotals, nightData).total;
 
@@ -233,27 +237,10 @@ export default {
 
       this.averages.daily = morningTotal + afternoonTotal + nightTotal;
     },
-    incrementDate(date, dateStr) {
-      for (let i = 0; i < this.masterStore.length; i++) {
-        if (this.masterStore[i].date === dateStr) {
-          this.masterStore[i][date.getHours()]++;
-          return true;
-        }
-      }
-
-      return false;
-    },
-    addDate(date, dateStr) {
-      this.masterStore.push({ date: dateStr });
-      for (let hr = 0; hr < 24; hr++) {
-        this.$set(this.masterStore[this.masterStore.length - 1], hr, 0);
-      }
-      this.masterStore[this.masterStore.length - 1][date.getHours()]++;
-    },
-    compressData() {
-      for (let record = 0; record < this.masterStore.length; record++) {
-        this.$set(this.compressedStore, record, {
-          date: this.masterStore[record].date,
+    compressData(context) {
+      for (let record = 0; record < this.state.masterStore.length; record++) {
+        this.state.$set(this.state.compressedStore, record, {
+          date: this.state.masterStore[record].date,
           morning: 0,
           afternoon: 0,
           night: 0,
@@ -261,40 +248,40 @@ export default {
 
         for (let hr = 0; hr < 24; hr++) {
           if (hr >= 0 && hr < 12) {
-            this.$set(
-              this.compressedStore[record],
+            this.state.$set( //TODO: 
+              this.state.compressedStore[record],
               "morning",
-              this.compressedStore[record].morning +
+              this.state.compressedStore[record].morning +
                 this.masterStore[record][hr]
             );
           }
           if (hr >= 12 && hr < 18) {
-            this.$set(
-              this.compressedStore[record],
+            this.state.$set( //TODO: 
+              this.state.compressedStore[record],
               "afternoon",
-              this.compressedStore[record].afternoon +
-                this.masterStore[record][hr]
+              this.state.compressedStore[record].afternoon +
+                this.state.masterStore[record][hr]
             );
           }
           if (hr >= 18 && hr <= 23) {
-            this.$set(
-              this.compressedStore[record],
+            this.state.$set( //TODO: 
+              this.state.compressedStore[record],
               "night",
-              this.compressedStore[record].night + this.masterStore[record][hr]
+              this.state.compressedStore[record].night + this.masterStore[record][hr]
             );
           }
         }
       }
     },
-    summariseData() {
-      this.summaryStore = this.compressedStore.map((record) => {
+    summariseData(context) {
+      this.state.summaryStore = this.state.compressedStore.map((record) => {
         return {
           date: record.date,
           total: record.morning + record.afternoon + record.night,
         };
       });
     },
-    printGraphData() {
+    printGraphData(context) {
       log("printing graph data", {}, "yellow");
       document.querySelectorAll("svg").forEach((s) => s.remove());
 
@@ -358,7 +345,7 @@ export default {
         }),
       ]);
 
-      // Add the valueline path.
+      // Add the valueline path
       svg
         .append("path") // Add the valueline path.
         .attr("class", "line")
@@ -398,15 +385,30 @@ export default {
         .attr("class", "y axis")
         .call(yAxis);
     },
-    enrichData() {
-      this.store();
-      this.compressData();
-      this.summariseData();
-      this.aggregateAverages();
-      this.findBestDay();
-      this.findWorstDay();
-      this.printGraphData();
-    },
+  },
+  mutations: {
+    // updateChecked(state, payload) {
+    //   state.checkedNames = payload;
+    // },
+    incrementDailyPicks(context) {
+      //this.state.
+    }
+  },
+});
+
+export default {
+  name: "Main",
+  store: store,
+  components: { EssentialLink, HabitButton, SummaryTable, Stats },
+  data() {
+    return {
+      leftDrawerOpen: this.$store.state.leftDrawerOpen,
+      version: this.$store.state.version,
+      essentialLinks: this.$store.state.essentialLinks
+    };
+  },
+  methods: {
+    
   },
   computed: {
     // checkedNames: {
@@ -441,14 +443,14 @@ export default {
   },
   created() {
     log("app instance created", {}, "limegreen");
-    this.compressData();
-    //localStorage.removeItem("misspicker");
+    this.$store.dispatch('compressData');
+    //localStorage.removeItem'compressData'("misspicker");
     //localStorage.removeItem(`misspicker${previousVersion}`);
   },
   mounted() {
     log("app instance mounted", {}, "limegreen");
     if (randomTest) {
-      this.masterStore = [
+      this.$store.state.masterStore = [
         { date: "10-Sep-2020" },
         { date: "11-Sep-2020" },
         { date: "12-Sep-2020" },
@@ -458,24 +460,23 @@ export default {
         { date: "16-Sep-2020" },
         { date: "17-Sep-2020" },
       ];
-      this.masterStore.forEach((record) => {
+      this.$store.state.masterStore.forEach((record) => {
         for (let hr = 0; hr < 24; hr++) {
-          this.$set(record, hr, utils.genRnd());
+          this.$set(record, hr, utils.genRnd()); //TODO: 
         }
       });
     } else {
-      this.masterStore =
-        this.masterStore.length > 0 ? this.masterStore : this.retrieve() || [];
+      this.$store.state.masterStore =
+        this.$store.state.masterStore.length > 0 ? this.$store.state.masterStore : this.retrieve() || [];
     }
 
-    this.enrichData();
-
-    window.t = this.printGraphData;
-    window.p = this.addPick;
+    //this.enrichData();
+    this.$store.dispatch('enrichData');
 
     if (autoInc.now) {
       setInterval(() => {
-        this.addPick();
+        // this.addPick();
+        this.$store.dispatch('addPick');
       }, 50);
     }
 
@@ -483,9 +484,9 @@ export default {
       console.clear();
     }
 
-    console.log("masterStore", this.masterStore);
-    console.log("compressedStore", this.compressedStore);
-    console.log("summaryStore", this.summaryStore);
+    console.log("masterStore", this.$store.state.masterStore);
+    console.log("compressedStore", this.$store.state.compressedStore);
+    console.log("summaryStore", this.$store.state.summaryStore);
   },
 };
 </script>
