@@ -131,7 +131,9 @@ export const store = new Vuex.Store({
       context.dispatch('aggregateAverages');
       context.dispatch('findBestDay');
       context.dispatch('findWorstDay');
-      if (window.location.href == '/graph') context.dispatch('printGraphData');
+
+      const href = window.location.href.split('/');
+      if (href[href.length - 1] == 'graph') context.dispatch('printGraphData');
     },
     store(context) {
       log('action:store', {}, colors.action);
@@ -267,7 +269,7 @@ export const store = new Vuex.Store({
       var label = d3.select('.sum-graph');
 
       // Set the dimensions of the canvas / graph
-      var margin = { top: 30, right: 20, bottom: 30, left: 50 },
+      var margin = { top: 30, right: 30, bottom: 30, left: 40 },
         width = 375 - margin.left - margin.right,
         height = 270 - margin.top - margin.bottom;
 

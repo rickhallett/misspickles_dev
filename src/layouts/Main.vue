@@ -1,5 +1,5 @@
 <template>
-  <q-layout view="lHh Lpr lFf">
+  <q-layout view="lHh Lpr lFf" class="font-applicator">
     <q-header elevated>
       <q-toolbar>
         <q-btn flat dense round icon="menu" aria-label="Menu" @click="leftDrawerOpen = !leftDrawerOpen"/>
@@ -144,6 +144,8 @@ export default {
 </script>
 
 <style>
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu+Mono:wght@400;700&display=swap');
+
 h1 {
   text-align: center;
   color: grey;
@@ -183,8 +185,7 @@ circle {
 }
 
 .font-applicator {
-  /* font-family: Cambria, Cochin, Georgia, Times, 'Times New Roman', serif; */
-  font-family: monospace, Cochin, Georgia, Times, "Times New Roman", serif;
+  font-family: Ubuntu Mono, monospace, sans-serif;
   background-color: #dfdbe5;
 }
 
