@@ -1,6 +1,7 @@
 <template>
   <q-page class="fit column no-wrap justify-around items-center content-start font-applicator bg-gears">
     <HabitButton />
+    <h2 class="text-primary">{{ totalPicksToday }}</h2>
     <Stats />
   </q-page>
 </template>
@@ -19,8 +20,25 @@ const log = utils.createLog("home");
 export default {
   name: "Main",
   components: { HabitButton, Stats, SummaryTable },
+  data() {
+    return {}
+  },
+  computed: {
+    totalPicksToday() {
+      return this.$store.getters.totalPicksToday;
+    }
+  }
 };
 </script>
+
+<style>
+  h2 {
+    font-size: 120px;
+    margin: 0;
+    margin-bottom: 30px;
+    opacity: 0.7;
+  }
+</style>
 
 
  
