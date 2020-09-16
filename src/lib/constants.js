@@ -77,3 +77,10 @@ JSON.clone = function (obj) {
   if (!obj) throw new Error("JSON.clone parameter value invalid.");
   return JSON.parse(JSON.stringify(obj));
 };
+
+export const colors = {
+  action: 'orange',
+  var: 'grey',
+  success: 'limegreen',
+  state: 'lightblue',
+}

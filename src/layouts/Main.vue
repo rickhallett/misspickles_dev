@@ -41,6 +41,7 @@ import {
   randomTest,
   autoInc,
   autoclear,
+  colors
 } from '../lib/constants';
 import { utils } from '../lib/utils';
 
@@ -94,14 +95,12 @@ export default {
     },
   },
   created() {
-    log('app instance created', {}, 'limegreen');
-    //this.$store.dispatch('compressData');
-    //localStorage.removeItem'compressData'('misspicker');
+    log('app instance created', {}, colors.success);
     //localStorage.removeItem(`misspicker${previousVersion}`);
   },
   mounted() {
     //debugger
-    log('app instance mounted', {}, 'limegreen');
+    log('app instance mounted', {}, colors.success);
     if (randomTest) {
       this.$store.state.masterStore = [
         { date: '10-Sep-2020' },
@@ -137,9 +136,9 @@ export default {
       console.clear();
     }
 
-    log('masterStore', this.$store.state.masterStore, 'lightblue');
-    log('compressedStore', this.$store.state.compressedStore, 'lightblue');
-    log('summaryStore', this.$store.state.summaryStore, 'lightblue');
+    log('masterStore', this.$store.state.masterStore, colors.state);
+    log('compressedStore', this.$store.state.compressedStore, colors.state);
+    log('summaryStore', this.$store.state.summaryStore, colors.state);
   },
 };
 </script>

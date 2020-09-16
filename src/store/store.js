@@ -1,6 +1,8 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 
+import { colors } from '../lib/constants';
+
 Vue.use(Vuex);
 
 import {
@@ -85,22 +87,25 @@ export const store = new Vuex.Store({
     },
     actions: {
       addPick(context, payload) {
-        log('action:addPick', {}, 'orange');
+        log('action:addPick', {}, colors.action);
         const date = new Date();
         const dateStr = `${date.getDate()}-${months[date.getMonth()]}-${date.getFullYear()}`;
+        log('dateStr', dateStr, colors.var);
   
-        //const didInc = this.incrementDate(date, dateStr);
-        const didInc = context.dispatch('incrementDate', date, dateStr)
-        if (!didInc) {
-          // this.addDate(date, dateStr);
-          context.dispatch('addDate', date, dateStr);
-        }
-  
-        // this.enrichData();
-        context.dispatch('enrichData');
+        context.dispatch('incrementDate', { date, dateStr }).then(didInc => {
+            console.log(dateStr);
+            log('didInc', didInc ? 'true' : 'false', colors.var);
+            if (!didInc) {
+                context.dispatch('addDate', { date, dateStr }).then(() => context.dispatch('enrichData'));
+                return;
+            }
+
+            context.dispatch('enrichData');
+        });
+        
       },
-      incrementDate(context, date, dateStr) {
-        log('action:incrementDate', {}, 'orange');
+      incrementDate(context, { date, dateStr }) {
+        log('action:incrementDate', {}, colors.action);
         for (let i = 0; i < this.state.masterStore.length; i++) {
           if (this.state.masterStore[i].date === dateStr) {
             this.state.masterStore[i][date.getHours()]++;
@@ -110,16 +115,16 @@ export const store = new Vuex.Store({
   
         return false;
       },
-      addDate(context, date, dateStr) {
-        log('action:addDate', {}, 'orange');
-        this.masterStore.push({ date: dateStr });
+      addDate(context, { date, dateStr }) {
+        log('action:addDate', {}, colors.action);
+        this.state.masterStore.push({ date: dateStr });
         for (let hr = 0; hr < 24; hr++) {
           Vue.set(this.state.masterStore[this.state.masterStore.length - 1], hr, 0); //TODO: 
         }
         this.state.masterStore[this.state.masterStore.length - 1][date.getHours()]++;
       },
       enrichData(context) {
-        log('action:enrichData', {}, 'orange');
+        log('action:enrichData', {}, colors.action);
         context.dispatch('store');
         context.dispatch('compressData');
         context.dispatch('summariseData');
@@ -129,18 +134,18 @@ export const store = new Vuex.Store({
         context.dispatch('printGraphData');
       },
       store(context) {
-        log('action:store', {}, 'orange');
+        log('action:store', {}, colors.action);
         localStorage.setItem(
           `misspicker${version}`,
           JSON.stringify(this.masterStore)
         );
       },
       retrieve(context) {
-        log('action:retrieve', {}, 'orange');
+        log('action:retrieve', {}, colors.action);
         return JSON.parse(localStorage.getItem(`misspicker${version}`));
       },
       findBestDay(context) {
-        log('action:findBestDay', {}, 'orange');
+        log('action:findBestDay', {}, colors.action);
         let best = {
           date: null,
           total: 0,
@@ -157,7 +162,7 @@ export const store = new Vuex.Store({
         this.best = best;
       },
       findWorstDay(context) {
-        log('action:findWorstDay', {}, 'orange');
+        log('action:findWorstDay', {}, colors.action);
         let worst = {
           date: null,
           total: 0,
@@ -174,7 +179,7 @@ export const store = new Vuex.Store({
         this.worst = worst;
       },
       aggregateAverages(context) {
-        log('action:aggregateAverages', {}, 'orange');
+        log('action:aggregateAverages', {}, colors.action);
         function addTotals({ total, count }, record) {
           return {
             total: total + record,
@@ -210,7 +215,7 @@ export const store = new Vuex.Store({
         this.state.averages.daily = morningTotal + afternoonTotal + nightTotal;
       },
       compressData(context) {
-        log('action:compressData', {}, 'orange');
+        log('action:compressData', {}, colors.action);
         for (let record = 0; record < this.state.masterStore.length; record++) {
           Vue.set(this.state.compressedStore, record, {
             date: this.state.masterStore[record].date,
@@ -247,7 +252,7 @@ export const store = new Vuex.Store({
         }
       },
       summariseData(context) {
-        log('action:summariseData', {}, 'orange');
+        log('action:summariseData', {}, colors.action);
         this.state.summaryStore = this.state.compressedStore.map((record) => {
           return {
             date: record.date,
@@ -256,7 +261,7 @@ export const store = new Vuex.Store({
         });
       },
       printGraphData(context) {
-        log('action:printGraphData', {}, 'orange');
+        log('action:printGraphData', {}, colors.action);
         document.querySelectorAll('svg').forEach((s) => s.remove());
   
         var label = d3.select('.sum-graph');
@@ -300,11 +305,17 @@ export const store = new Vuex.Store({
         // Get the data
   
         let data = JSON.clone(this.state.summaryStore);
-  
+        console.log("printGraphData -> this.state.summaryStore", this.state.summaryStore)
+        console.log("printGraphData -> data", data)
+
+        
+        //debugger
         data.forEach(function (d) {
           d.date = parseDate(d.date);
           d.close = +d.total;
         });
+
+        console.log("printGraphData -> data:after parse", data)
   
         // Scale the range of the data
         x.domain(
