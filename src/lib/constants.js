@@ -43,22 +43,22 @@ export const linksData = [
   }
 ];
 
-export const version = "2.0.0";
-export const previousVersion = "1.2.0";
+export const version = '2.0.0';
+export const previousVersions = ['0.0.1', '0.0.2', '1.1.1', '1.2.1', '1.2.0'];
 
 export const months = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sep",
-  "Oct",
-  "Nov",
-  "Dec",
+  'Jan',
+  'Feb',
+  'Mar',
+  'Apr',
+  'May',
+  'Jun',
+  'Jul',
+  'Aug',
+  'Sep',
+  'Oct',
+  'Nov',
+  'Dec',
 ];
 
 export const debug = {
@@ -74,7 +74,7 @@ export const autoInc = {
 export const autoclear = !debug.log;
 
 JSON.clone = function (obj) {
-  if (!obj) throw new Error("JSON.clone parameter value invalid.");
+  if (!obj) throw new Error('JSON.clone parameter value invalid.');
   return JSON.parse(JSON.stringify(obj));
 };
 

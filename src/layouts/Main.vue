@@ -41,7 +41,7 @@ import {
   randomTest,
   autoInc,
   autoclear,
-  colors
+  colors, previousVersions
 } from '../lib/constants';
 import { utils } from '../lib/utils';
 
@@ -96,7 +96,7 @@ export default {
   },
   created() {
     log('app instance created', {}, colors.success);
-    //localStorage.removeItem(`misspicker${previousVersion}`);
+    previousVersions.forEach(v => localStorage.removeItem(`misspicker${v}`));
   },
   mounted() {
     //debugger
