@@ -1,6 +1,6 @@
 <template>
   <q-page class="fit column no-wrap justify-around items-center content-start font-applicator">
-    <h1>Stats</h1>
+    <SummaryTable />
   </q-page>
 </template>
 
@@ -9,11 +9,13 @@
 import { version, previousVersion, months, debug, randomTest, autoInc, autoclear } from '../lib/constants';
 import { utils } from '../lib/utils';
 
+import SummaryTable from '../components/SummaryTable';
+
 const log = utils.createLog("stats");
 
 export default {
   name: "Stats",
-  
+  components: { SummaryTable }
 };
 </script>
 

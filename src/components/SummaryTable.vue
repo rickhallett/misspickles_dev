@@ -34,7 +34,14 @@ export default {
   name: 'SummaryTable',
   data() {
     return {
-
+      bestDay: this.$store.state.bestDay,
+      worstDay: this.$store.state.worstDay,
+      averages: {
+        daily: this.$store.state.averages.daily,
+        am: this.$store.state.averages.am,
+        pm: this.$store.state.averages.pm,
+        night: this.$store.state.averages.night
+      }
     };
   },
   created() {

@@ -1,6 +1,8 @@
 <template>
   <q-page class="fit column no-wrap justify-around items-center content-start font-applicator">
-    <h1>Edit</h1>
+    <h4>Edit</h4>
+    <h6>Coming soon..!</h6>
+    <h6>:)</h6>
   </q-page>
 </template>
 

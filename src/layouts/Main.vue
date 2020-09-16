@@ -27,7 +27,7 @@ import Vuex from 'vuex';
 
 import EssentialLink from 'components/EssentialLink.vue';
 import SummaryTable from '../components/SummaryTable';
-import Stats from '../components/Stats';
+import StatsTable from '../components/StatsTable';
 import HabitButton from '../components/HabitButton';
 
 
@@ -52,7 +52,7 @@ import { store } from '../store/store';
 export default {
   name: 'Main',
   store: store,
-  components: { EssentialLink, HabitButton, SummaryTable, Stats },
+  components: { EssentialLink, HabitButton, SummaryTable, StatsTable },
   data() {
     return {
       leftDrawerOpen: this.$store.state.leftDrawerOpen,
@@ -96,38 +96,13 @@ export default {
   },
   created() {
     log('app instance created', {}, colors.success);
-    previousVersions.forEach(v => localStorage.removeItem(`misspicker${v}`));
+    //previousVersions.forEach(v => localStorage.removeItem(`misspicker${v}`));
   },
   mounted() {
-    //debugger
     log('app instance mounted', {}, colors.success);
-    if (randomTest) {
-      this.$store.state.masterStore = [
-        { date: '10-Sep-2020' },
-        { date: '11-Sep-2020' },
-        { date: '12-Sep-2020' },
-        { date: '13-Sep-2020' },
-        { date: '14-Sep-2020' },
-        { date: '15-Sep-2020' },
-        { date: '16-Sep-2020' },
-        { date: '17-Sep-2020' },
-      ];
-      this.$store.state.masterStore.forEach((record) => {
-        for (let hr = 0; hr < 24; hr++) {
-          this.$set(record, hr, utils.genRnd()); //TODO: 
-        }
-      });
-    } else {
-      this.$store.state.masterStore =
-        this.$store.state.masterStore.length > 0 ? this.$store.state.masterStore : this.retrieve() || [];
-    }
-
-    //this.enrichData();
-    this.$store.dispatch('enrichData');
-
+    
     if (autoInc.now) {
       setInterval(() => {
-        // this.addPick();
         this.$store.dispatch('addPick');
       }, 50);
     }

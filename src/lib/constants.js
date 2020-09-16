@@ -21,7 +21,7 @@ export const linksData = [
     title: 'Stats',
     caption: 'Overview',
     icon: 'article',
-    link: '/chart',
+    link: '/stats',
   },
   {
     title: 'Journal',
@@ -43,7 +43,7 @@ export const linksData = [
   }
 ];
 
-export const version = '2.0.0';
+export const version = '1.1.1';
 export const previousVersions = ['0.0.1', '0.0.2', '1.1.1', '1.2.1', '1.2.0'];
 
 export const months = [
@@ -65,7 +65,7 @@ export const debug = {
   log: true,
 };
 
-export const randomTest = true;
+export const randomTest = false;
 
 export const autoInc = {
   now: false,

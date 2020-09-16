@@ -109,7 +109,6 @@ export const store = new Vuex.Store({
       log('dateStr', dateStr, colors.var);
 
       context.dispatch('incrementDate', { date, dateStr }).then(didInc => {
-        console.log(dateStr);
         log('didInc', didInc ? 'true' : 'false', colors.var);
         if (!didInc) {
           context.dispatch('addDate', { date, dateStr }).then(() => context.dispatch('enrichData'));
@@ -135,7 +134,7 @@ export const store = new Vuex.Store({
       log('action:addDate', {}, colors.action);
       this.state.masterStore.push({ date: dateStr });
       for (let hr = 0; hr < 24; hr++) {
-        Vue.set(this.state.masterStore[this.state.masterStore.length - 1], hr, 0); //TODO: 
+        Vue.set(this.state.masterStore[this.state.masterStore.length - 1], hr, 0); 
       }
       this.state.masterStore[this.state.masterStore.length - 1][date.getHours()]++;
     },
@@ -151,11 +150,43 @@ export const store = new Vuex.Store({
       const href = window.location.href.split('/');
       if (href[href.length - 1] == 'graph') context.dispatch('printGraphData');
     },
+    loadData(context) {
+      if (randomTest) {
+        this.state.masterStore = [
+          { date: '10-Sep-2020' },
+          { date: '11-Sep-2020' },
+          { date: '12-Sep-2020' },
+          { date: '13-Sep-2020' },
+          { date: '14-Sep-2020' },
+          { date: '15-Sep-2020' },
+          { date: '16-Sep-2020' },
+          { date: '17-Sep-2020' },
+        ];
+        this.state.masterStore.forEach((record) => {
+          for (let hr = 0; hr < 24; hr++) {
+            this.$set(record, hr, utils.genRnd());
+          }
+        });
+      } else {
+        this.state.masterStore =
+          this.state.masterStore.length > 0 ? this.state.masterStore : [];
+          if (this.state.masterStore.length === 0) {
+            this.dispatch('retrieve').then(data => {
+              console.log("loadData -> data", data)
+              
+              this.state.masterStore = data;
+              //Vue.set(this.state, 'masterStore', data);
+            })
+          }
+      }
+    },
     store(context) {
       log('action:store', {}, colors.action);
+      console.log("store -> this.state.masterStore", this.state.masterStore)
       localStorage.setItem(
         `misspicker${version}`,
         JSON.stringify(this.state.masterStore)
+        
       );
     },
     retrieve(context) {

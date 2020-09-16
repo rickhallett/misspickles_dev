@@ -10,7 +10,7 @@
 
 <script>
 export default {
-  name: 'SummaryTable',
+  name: 'StatsTable',
   data() {
     return {
       data: this.$store.state.compressedStore,
