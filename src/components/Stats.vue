@@ -13,13 +13,12 @@ export default {
   name: 'SummaryTable',
   data() {
     return {
-      data: [],
-      columns: []
+      data: this.$store.state.compressedStore,
+      columns: this.$store.state.compressedStoreTableCols
     };
   },
   created() {
-    this.data = this.$store.state.compressedStore;
-    this.columns = this.$store.state.compressedStoreTableCols;
+    
   }
 }
 </script>

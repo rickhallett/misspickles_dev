@@ -14,7 +14,7 @@ import SummaryTable from '../components/SummaryTable';
 import Stats from '../components/Stats';
 import HabitButton from '../components/HabitButton';
 
-const log = utils.createLog("app");
+const log = utils.createLog("home");
 
 export default {
   name: "Main",

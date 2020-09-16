@@ -43,8 +43,8 @@ export const linksData = [
   }
 ];
 
-export const version = "1.2.0";
-export const previousVersion = "1.1.1";
+export const version = "2.0.0";
+export const previousVersion = "1.2.0";
 
 export const months = [
   "Jan",
